@@ -83,7 +83,7 @@ async function cercaImmagine(titolo) {
             const foto = data.results[0];
 
             return {
-                url: foto.urls.regular, // hotlinking corretto
+                url: foto.urls.regular, 
                 photographer: foto.user.name,
                 photographerLink: foto.user.links.html,
                 photoLink: foto.links.html
@@ -94,7 +94,7 @@ async function cercaImmagine(titolo) {
         console.warn("Unsplash error:", e);
     }
 
-    // fallback
+    
     return {
         url: `https://picsum.photos/seed/${query}/400/250`,
         photographer: "Unknown",
