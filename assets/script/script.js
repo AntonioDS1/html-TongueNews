@@ -66,9 +66,8 @@ function getBadge(notizia) {
     }
 }
 
-
 async function cercaImmagine(titolo) {
-    const apiKey = "LA_TUA_API_KEY";
+    const apiKey = "o--s0aDVvapFyULadKqUyv8m_VbtNkcgyBwwJOoprzo";
     const query = encodeURIComponent(titolo);
 
     try {
@@ -76,20 +75,33 @@ async function cercaImmagine(titolo) {
             `https://api.unsplash.com/search/photos?query=${query}&per_page=1&orientation=landscape&client_id=${apiKey}`
         );
 
-        if (!res.ok) throw new Error("Errore Unsplash");
+        if (!res.ok) throw new Error("Errore Unsplash API");
+
         const data = await res.json();
 
         if (data.results.length > 0) {
-            return data.results[0].urls.small;
+            const foto = data.results[0];
+
+            return {
+                url: foto.urls.regular, // hotlinking corretto
+                photographer: foto.user.name,
+                photographerLink: foto.user.links.html,
+                photoLink: foto.links.html
+            };
         }
 
     } catch (e) {
         console.warn("Unsplash error:", e);
     }
 
-    return `https://picsum.photos/seed/${query}/400/250`;
+    // fallback
+    return {
+        url: `https://picsum.photos/seed/${query}/400/250`,
+        photographer: "Unknown",
+        photographerLink: "#",
+        photoLink: "#"
+    };
 }
-
 
 
 let grid = document.querySelector(".grid");
@@ -118,45 +130,66 @@ async function creaCards() {
             day: "numeric"
         });
 
-        const imageUrl = await cercaImmagine(titolo);
+        const imageObj = await cercaImmagine(titolo);
+        const imageUrl = imageObj.url;
+
 
 
         if (notizia === 1) {
 
             hero.innerHTML = `
-                <div class="hero-media">
-                    <img src="${imageUrl}" alt="">
-                    <div class="hero-overlay"></div>
-                    <span class="hero-badge">TOP STORY</span>
-                </div>
+                            <div class="hero-media">
+                                <img src="${imageObj.url}" alt="">
+                                <div class="hero-overlay"></div>
+                                <span class="hero-badge">TOP STORY</span>
+                            </div>
 
-                <div class="hero-content">
-                    <h1 class="hero-title">N°${notizia}, ${titolo}</h1>
-                    <p class="hero-date">${formattedDate}</p>
-                    <a href="${link}" target="_blank" class="btn hero-btn">Read Full Story</a>
-                </div>
-            `;
+                            <div class="hero-content">
+                                <h1 class="hero-title">N°${notizia}, ${titolo}</h1>
+                                <p class="hero-date">${formattedDate}</p>
+                                <a href="${link}" target="_blank" class="btn hero-btn">Read Full Story</a>
+
+                                <p class="photo-credit">
+                                    Photo by
+                                    <a href="${imageObj.photographerLink}" target="_blank">
+                                        ${imageObj.photographer}
+                                    </a>
+                                    on
+                                    <a href="${imageObj.photoLink}" target="_blank">Unsplash</a>
+                                </p>
+                            </div>
+                        `;
+
 
 
         } else {
 
             const { label, classes } = getBadge(notizia);
 
-            let card = document.createElement("article");
+            const card = document.createElement("article");
             card.classList.add("card");
 
             card.innerHTML = `
                 <div class="card-thumb">
-                    <img src="${imageUrl}" alt="">
+                    <img src="${imageObj.url}" alt="">
                 </div>
 
                 <span class="${classes}">${label}</span>
-
                 <h3 class="card-title">N°${notizia}, ${titolo}</h3>
                 <p class="card-date">${formattedDate}</p>
 
                 <a href="${link}" target="_blank" class="card-more">Read more</a>
+
+                <p class="photo-credit">
+                    Photo by
+                    <a href="${imageObj.photographerLink}" target="_blank">
+                        ${imageObj.photographer}
+                    </a>
+                    on
+                    <a href="${imageObj.photoLink}" target="_blank">Unsplash</a>
+                </p>
             `;
+
 
             grid.append(card);
         }
