@@ -21,7 +21,7 @@ async function recuperaListaIdNews() {
 }
 
 async function prendiBatch() {
-    // Prendi la lista solo la prima volta
+
     if (!listaPresa) {
         await recuperaListaIdNews();
         listaPresa = true;
@@ -29,13 +29,13 @@ async function prendiBatch() {
 
     currentIds = [];
 
-    // Prendi i prossimi 10 ID
+
     const batch = ids.slice(indiceBatch, indiceBatch + 10);
 
-    // Aggiorna l’indice
+
     indiceBatch += 10;
 
-    // Salva gli ID presi
+
     currentIds.push(...batch);
 }
 
@@ -98,7 +98,7 @@ async function creaCards() {
 
     const hero = document.querySelector(".hero");
 
-    // Loader quando è la prima notizia
+
     if (notizia === 1) {
         hero.innerHTML = `<div class="loader"></div>`;
     }
@@ -120,7 +120,7 @@ async function creaCards() {
 
         const imageUrl = await cercaImmagine(titolo);
 
-        // ---------- HERO ----------
+
         if (notizia === 1) {
 
             hero.innerHTML = `
@@ -137,7 +137,7 @@ async function creaCards() {
                 </div>
             `;
 
-        // ---------- CARD ----------
+
         } else {
 
             const { label, classes } = getBadge(notizia);
@@ -176,13 +176,13 @@ function caricaDiPiù() {
 
     caricaBtn.addEventListener("click", async () => {
 
-        // Nascondi testo e mostra loader
+
         caricaBtn.disabled = true;
         caricaBtn.innerHTML = `<div class="loader-small"></div>`;
 
         await creaCards();
 
-        // Ripristina il bottone
+
         caricaBtn.disabled = false;
         caricaBtn.textContent = "LOAD MORE";
     });
@@ -196,7 +196,7 @@ function cercaNotizie() {
     const query = document.querySelector(".search-input").value.trim().toLowerCase();
     const cards = document.querySelectorAll(".grid .card");
 
-    // Se input vuoto → mostra tutto
+
     if (query === "") {
         cards.forEach(card => {
             card.style.display = "flex";
@@ -204,12 +204,12 @@ function cercaNotizie() {
         return;
     }
 
-    // Filtra le card
+
     cards.forEach(card => {
 
         const title = card.querySelector(".card-title")?.textContent.toLowerCase() || "";
 
-        // Se il titolo contiene le lettere → mostrala, altrimenti nascondila
+
         if (title.includes(query)) {
             card.style.display = "flex";
         } else {
