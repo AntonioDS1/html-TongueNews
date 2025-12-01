@@ -67,34 +67,29 @@ function getBadge(notizia) {
 }
 
 async function cercaImmagine(titolo) {
-    const apiKey = "o--s0aDVvapFyULadKqUyv8m_VbtNkcgyBwwJOoprzo";
     const query = encodeURIComponent(titolo);
 
     try {
         const res = await fetch(
-            `https://api.unsplash.com/search/photos?query=${query}&per_page=1&orientation=landscape&client_id=${apiKey}`
+            `https://white-fire-26d3.desienagaetano646.workers.dev/?q=${query}`
         );
-
-        if (!res.ok) throw new Error("Errore Unsplash API");
 
         const data = await res.json();
 
-        if (data.results.length > 0) {
+        if (data.results?.length > 0) {
             const foto = data.results[0];
 
             return {
-                url: foto.urls.regular, 
+                url: foto.urls.regular,
                 photographer: foto.user.name,
                 photographerLink: foto.user.links.html,
                 photoLink: foto.links.html
             };
         }
-
-    } catch (e) {
-        console.warn("Unsplash error:", e);
+    } catch (error) {
+        console.warn("Proxy Unsplash error:", error);
     }
 
-    
     return {
         url: `https://picsum.photos/seed/${query}/400/250`,
         photographer: "Unknown",
