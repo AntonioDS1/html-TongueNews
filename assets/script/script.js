@@ -105,15 +105,28 @@ async function creaCards() {
 
     const hero = document.querySelector(".hero");
 
-
+    
     if (notizia === 1) {
         hero.innerHTML = `<div class="loader"></div>`;
     }
 
+    
     await prendiBatch();
     await ottieniNews(currentIds);
 
-    for (let j of currentNews) {
+    
+    const imagePromises = currentNews.map(n =>
+        cercaImmagine(n.title || "Untitled Article")
+    );
+
+    
+    const images = await Promise.all(imagePromises);
+
+    
+    for (let i = 0; i < currentNews.length; i++) {
+
+        const j = currentNews[i];
+        const imageObj = images[i];
 
         const titolo = j.title || "Untitled Article";
         const link = j.url || "#";
@@ -125,40 +138,34 @@ async function creaCards() {
             day: "numeric"
         });
 
-        const imageObj = await cercaImmagine(titolo);
-        const imageUrl = imageObj.url;
-
-
-
+        
         if (notizia === 1) {
 
             hero.innerHTML = `
-                            <div class="hero-media">
-                                <img src="${imageObj.url}" alt="">
-                                <div class="hero-overlay"></div>
-                                <span class="hero-badge">TOP STORY</span>
-                            </div>
+                <div class="hero-media">
+                    <img src="${imageObj.url}" alt="">
+                    <div class="hero-overlay"></div>
+                    <span class="hero-badge">TOP STORY</span>
+                </div>
 
-                            <div class="hero-content">
-                                <h1 class="hero-title">N°${notizia}, ${titolo}</h1>
-                                <p class="hero-date">${formattedDate}</p>
-                                <a href="${link}" target="_blank" class="btn hero-btn">Read Full Story</a>
+                <div class="hero-content">
+                    <h1 class="hero-title">N°${notizia}, ${titolo}</h1>
+                    <p class="hero-date">${formattedDate}</p>
+                    <a href="${link}" target="_blank" class="btn hero-btn">Read Full Story</a>
 
-                                <p class="photo-credit">
-                                    Photo by
-                                    <a href="${imageObj.photographerLink}" target="_blank">
-                                        ${imageObj.photographer}
-                                    </a>
-                                    on
-                                    <a href="${imageObj.photoLink}" target="_blank">Unsplash</a>
-                                </p>
-                            </div>
-                        `;
-
-
+                    <p class="photo-credit">
+                        Photo by
+                        <a href="${imageObj.photographerLink}" target="_blank">
+                            ${imageObj.photographer}
+                        </a>
+                        on
+                        <a href="${imageObj.photoLink}" target="_blank">Unsplash</a>
+                    </p>
+                </div>
+            `;
 
         } else {
-
+            
             const { label, classes } = getBadge(notizia);
 
             const card = document.createElement("article");
@@ -185,15 +192,16 @@ async function creaCards() {
                 </p>
             `;
 
-
             grid.append(card);
         }
 
         notizia++;
     }
 
+    
     currentNews = [];
 }
+
 
 
 
